@@ -1,17 +1,17 @@
+// App.tsx
+import React from 'react';
 import { Provider } from 'react-redux';
-import './App.css';
-import UIAIChatApp from './components/ui-ai-chat';
-import { store } from './store';
+import { store } from './redux/store';
+import MainView from './components/MainView';
 
-function App() {
+const App: React.FC = () => {
   return (
     <Provider store={store}>
-      <div className="App">
-        <UIAIChatApp />
+      <div style={{ height: '100vh', overflow: 'hidden' }}>
+        <MainView />
       </div>
     </Provider>
-
   );
-}
+};
 
 export default App;

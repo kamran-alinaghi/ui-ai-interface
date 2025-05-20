@@ -1,12 +1,14 @@
+// redux/store.ts
 import { configureStore } from '@reduxjs/toolkit';
-import uiAISlice from './uiAISlice';
+import projectsReducer from './projectsSlice';
+import chatReducer from './chatSlice';
 
 export const store = configureStore({
   reducer: {
-    uiAI: uiAISlice,
+    projects: projectsReducer,
+    chat: chatReducer,
   },
 });
 
-// Types for use throughout the app
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
