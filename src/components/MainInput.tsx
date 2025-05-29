@@ -1,4 +1,3 @@
-// components/MainInput.tsx
 import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { addMessage, updateAIResponse } from '../redux/chatSlice';

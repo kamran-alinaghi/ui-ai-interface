@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, JSX } from 'react';
 import { SidebarContainer, Wrapper } from '../styles/Sidebar.style';
 import { ResizeHandle, FloatingToggle } from '../styles/SidebarRight.style';
+import FlowChart from './ReactFlow';
+import ReactFlow from 'reactflow';
 
 
 
@@ -66,6 +68,7 @@ export default function SidebarRight({ content }: { content: JSX.Element }) {
       >
         {!hidden && <ResizeHandle className="resize-handle"/>}
         {content}
+        <FlowChart/>
       </SidebarContainer>
     </Wrapper>
   );

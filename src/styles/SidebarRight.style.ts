@@ -8,6 +8,7 @@ export const ResizeHandle = styled.div`
   height: 100%;
   cursor: ew-resize;
   background-color: transparent;
+  z-index: 10;
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.1);
@@ -24,7 +25,7 @@ export const FloatingToggle = styled.button`
   border: 1px solid #ccc;
   border-radius: 4px 0px 0px 4px;
   cursor: pointer;
-  z-index: 10;
+  z-index: 1;
 
   &:hover {
     background-color: #d0d0d0;

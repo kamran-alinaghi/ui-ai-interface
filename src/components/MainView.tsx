@@ -3,6 +3,7 @@ import SidebarLeft from './SidebarLeft';
 import SidebarRight from './SidebarRight';
 import ChatWindow from './ChatWindow';
 import MainInput from './MainInput';
+import FlowChart from './ReactFlow';
 
 export default function MainView() {
   return (
