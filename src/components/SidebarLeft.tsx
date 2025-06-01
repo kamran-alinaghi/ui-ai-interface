@@ -7,6 +7,7 @@ import ProjectListItem from './ProjectListItem';
 import { setView } from '../redux/uiSlice';
 import { auth } from './firebase-ui/firebase';
 import { setUser } from '../redux/authSlice';
+import ThemeToggle from './ThemeToggle';
 
 export default function SidebarLeft() {
   const dispatch = useAppDispatch();
@@ -24,15 +25,8 @@ export default function SidebarLeft() {
     setTimeout(() => setIsToggling(false), 300);
   };
 
-  const handleLogout = () => {
-    auth.signOut()
-      .then(() => {
-        dispatch(setUser(null));       // clear the user in Redux
-        dispatch(setView('login'));    // optionally switch back to the login view
-      })
-      .catch((error) => {
-        console.error("Error signing out:", error);
-      });
+  const handleLogout = () => {     
+        dispatch(setView('login'));  
   };
 
   useEffect(() => {
@@ -78,7 +72,7 @@ export default function SidebarLeft() {
       >
         {!hidden && <ResizeHandle className="resize-handle" />}
         <UserAccount>
-          <button onClick={() => handleLogout()}>Account</button>
+          <button onClick={() => dispatch(setView('dashboard'))}>Account</button>
         </UserAccount>
         <TopBar>
           <button onClick={() => dispatch(createProject())}>+ New</button>

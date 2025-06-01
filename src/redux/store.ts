@@ -3,6 +3,7 @@ import projectsReducer from './projectsSlice';
 import chatReducer from './chatSlice';
 import authReducer from './authSlice';
 import uiReducer from './uiSlice';
+import themeReducer from './themeSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     chat: chatReducer,
     auth: authReducer,
     ui: uiReducer,
+    theme: themeReducer,
   },
 });
 
