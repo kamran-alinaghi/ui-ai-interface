@@ -2,8 +2,11 @@ import { useState, useRef, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { createProject} from '../redux/projectsSlice';
 import { SidebarContainer, Wrapper } from '../styles/Sidebar.style';
-import { FloatingToggle, ResizeHandle, TopBar } from '../styles/SidebarLeft.style';
+import { FloatingToggle, ResizeHandle, TopBar, UserAccount } from '../styles/SidebarLeft.style';
 import ProjectListItem from './ProjectListItem';
+import { setView } from '../redux/uiSlice';
+import { auth } from './firebase-ui/firebase';
+import { setUser } from '../redux/authSlice';
 
 export default function SidebarLeft() {
   const dispatch = useAppDispatch();
@@ -19,6 +22,17 @@ export default function SidebarLeft() {
     setIsToggling(true);
     setHidden((prev) => !prev);
     setTimeout(() => setIsToggling(false), 300);
+  };
+
+  const handleLogout = () => {
+    auth.signOut()
+      .then(() => {
+        dispatch(setUser(null));       // clear the user in Redux
+        dispatch(setView('login'));    // optionally switch back to the login view
+      })
+      .catch((error) => {
+        console.error("Error signing out:", error);
+      });
   };
 
   useEffect(() => {
@@ -63,6 +77,9 @@ export default function SidebarLeft() {
         isToggling={isToggling}
       >
         {!hidden && <ResizeHandle className="resize-handle" />}
+        <UserAccount>
+          <button onClick={() => handleLogout()}>Account</button>
+        </UserAccount>
         <TopBar>
           <button onClick={() => dispatch(createProject())}>+ New</button>
         </TopBar>

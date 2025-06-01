@@ -20,6 +20,15 @@ export const TopBar = styled.div`
   padding: 4px;
 `;
 
+export const UserAccount = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 4px;
+  background-color: rgb(250, 250, 100);
+`;
+
 export const ResizeHandle = styled.div`
   position: absolute;
   right: 0;
