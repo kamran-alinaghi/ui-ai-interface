@@ -9,8 +9,8 @@ export const Container = styled.div`
   margin-bottom: 8px;
 `;
 
-export const NameButton = styled.button<{ active: boolean }>`
-  background-color: ${({ active }) => (active ? '#2a93f5' : '#1e3a8a')};
+export const NameButton = styled.button<{ active: boolean, themeMode: 'light' | 'dark' }>`
+  background-color: ${({ active , themeMode }) => (themeMode==='light'? (active ? '#2a93f5' : '#1e3a8a'):(active ? '#1b3070' : '#0f1b40'))};
   color: white;
   padding: 6px 10px;
   border: none;
@@ -23,8 +23,8 @@ export const NameButton = styled.button<{ active: boolean }>`
   }
 `;
 
-export const MoreButton = styled.button<{ active: boolean }>`
-  background-color: ${({ active }) => (active ? '#2a93f5' : '#1e3a8a')};
+export const MoreButton = styled.button<{ active: boolean, themeMode: 'light' | 'dark' }>`
+  background-color: ${({ active , themeMode }) => (themeMode==='light'? (active ? '#2a93f5' : '#1e3a8a'):(active ? '#1b3070' : '#0f1b40'))};
   color: white;
   padding: 6px 8px;
   border: none;
@@ -37,14 +37,15 @@ export const MoreButton = styled.button<{ active: boolean }>`
   }
 `;
 
-export const Dropdown = styled.div`
+export const Dropdown = styled.div<{ themeMode: 'light' | 'dark' }>`
   position: absolute;
-  top: 36px;
-  left: 0;
-  background-color: white;
+  top: 30px;
+  left: 90px;
+  background-color: ${({ themeMode }) => (themeMode === 'dark' ? '#333' : '#fff')};
+  color: ${({ themeMode }) => (themeMode === 'dark' ? '#ffffff' : '#000000')};
   border: 1px solid #ccc;
   border-radius: 6px;
-  z-index: 100;
+  z-index: 10;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   overflow: hidden;
 `;
@@ -54,8 +55,6 @@ export const DropdownItem = styled.div`
   cursor: pointer;
   white-space: nowrap;
   font-size: 14px;
-  color: #333;
-
   &:hover {
     background-color: #e5e5e5;
   }

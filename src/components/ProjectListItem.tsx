@@ -13,7 +13,7 @@ import {
   Dropdown,
   DropdownItem,
 } from '../styles/ProjectListItem.style';
-import { ConfirmDialog } from './ConfirmDialog';
+import PopupView from './PopupView';
 
 interface Props {
   project: Project;
@@ -24,29 +24,30 @@ const ProjectListItem: React.FC<Props> = ({ project }) => {
   const activeId = useAppSelector((s) => s.projects.activeProjectId);
   const [menuOpen, setMenuOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const theme = useAppSelector((state) => state.theme.theme);
 
+  const [popupMode, setPopupMode] = useState<'prompt' | 'confirm' | null>(null);
+  const [popupMessage, setPopupMessage] = useState('');
 
   const handleRename = () => {
-    const newName = prompt('Rename project', project.name);
-    if (newName) {
-      dispatch(renameProject({ id: project.id, newName }));
-    }
+    setPopupMessage(`Rename project "${project.name}"`);
+    setPopupMode('prompt');
     setMenuOpen(false);
   };
 
   const handleDelete = () => {
-    setIsConfirmOpen(true);
+    setPopupMessage(`Are you sure you want to delete "${project.name}"?`);
+    setPopupMode('confirm');
     setMenuOpen(false);
   };
 
-  const confirmDelete = () => {
-    dispatch(deleteProject(project.id));
-    setIsConfirmOpen(false);
-  };
-
-  const cancelDelete = () => {
-    setIsConfirmOpen(false);
+  const handlePopupClose = (result?: string | boolean) => {
+    if (popupMode === 'prompt' && typeof result === 'string' && result.trim() !== '') {
+      dispatch(renameProject({ id: project.id, newName: result }));
+    } else if (popupMode === 'confirm' && result === true) {
+      dispatch(deleteProject(project.id));
+    }
+    setPopupMode(null);
   };
 
   const handleOutsideClick = (e: MouseEvent) => {
@@ -61,7 +62,6 @@ const ProjectListItem: React.FC<Props> = ({ project }) => {
     } else {
       document.removeEventListener('mousedown', handleOutsideClick);
     }
-
     return () => {
       document.removeEventListener('mousedown', handleOutsideClick);
     };
@@ -71,25 +71,31 @@ const ProjectListItem: React.FC<Props> = ({ project }) => {
     <Container ref={ref}>
       <NameButton
         active={project.id === activeId}
+        themeMode={theme}
         onClick={() => dispatch(selectProject(project.id))}
       >
         {project.name}
       </NameButton>
-      <MoreButton 
-      active={project.id === activeId}
-      onClick={() => setMenuOpen((open) => !open)}>⋮</MoreButton>
+      <MoreButton
+        active={project.id === activeId}
+        themeMode={theme}
+        onClick={() => setMenuOpen((open) => !open)}
+      >
+        ⋮
+      </MoreButton>
       {menuOpen && (
-        <Dropdown>
+        <Dropdown themeMode={theme}>
           <DropdownItem onClick={handleRename}>Rename</DropdownItem>
           <DropdownItem onClick={handleDelete}>Delete</DropdownItem>
         </Dropdown>
       )}
-      <ConfirmDialog
-        isOpen={isConfirmOpen}
-        message={`Are you sure you want to delete "${project.name}"?`}
-        onConfirm={confirmDelete}
-        onCancel={cancelDelete}
-      />
+      {popupMode && (
+        <PopupView
+          mode={popupMode}
+          message={popupMessage}
+          onClose={handlePopupClose}
+        />
+      )}
     </Container>
   );
 };
