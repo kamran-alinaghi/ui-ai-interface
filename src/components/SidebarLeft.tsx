@@ -8,6 +8,7 @@ import { setView } from '../redux/uiSlice';
 import { auth } from './firebase-ui/firebase';
 import { setUser } from '../redux/authSlice';
 import ThemeToggle from './ThemeToggle';
+import UserProfileMenu from './UserProfileMenu';
 
 export default function SidebarLeft() {
   const dispatch = useAppDispatch();
@@ -71,9 +72,7 @@ export default function SidebarLeft() {
         isToggling={isToggling}
       >
         {!hidden && <ResizeHandle className="resize-handle" />}
-        <UserAccount>
-          <button onClick={() => dispatch(setView('dashboard'))}>Account</button>
-        </UserAccount>
+        <UserProfileMenu/>
         <TopBar>
           <button onClick={() => dispatch(createProject())}>+ New</button>
         </TopBar>
