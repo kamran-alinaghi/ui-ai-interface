@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useAppSelector } from '../hooks';
 
 type PopupMode = 'message' | 'confirm' | 'prompt';
 
@@ -22,8 +23,9 @@ const Overlay = styled.div`
   z-index: 1000;
 `;
 
-const PopupContainer = styled.div`
-  background: white;
+const PopupContainer = styled.div<{ themeMode: 'light' | 'dark' }>`
+  background-color: ${({ themeMode }) => (themeMode === 'dark' ? '#222' : '#f9f9f9')};
+  color: ${({ themeMode }) => (themeMode === 'dark' ? '#fff' : '#000')};
   padding: 24px;
   border-radius: 8px;
   max-width: 400px;
@@ -61,6 +63,7 @@ const TextBox = styled.input`
 
 const PopupView: React.FC<PopupProps> = ({ mode, message, onClose }) => {
   const [inputValue, setInputValue] = useState('');
+  const theme = useAppSelector((state) => state.theme.theme);
 
   const handleConfirm = () => {
     if (mode === 'prompt') {
@@ -80,7 +83,7 @@ const PopupView: React.FC<PopupProps> = ({ mode, message, onClose }) => {
 
   return (
     <Overlay>
-      <PopupContainer>
+      <PopupContainer themeMode={theme}>
         <p>{message}</p>
         {mode === 'prompt' && (
           <TextBox

@@ -18,6 +18,14 @@ const DashboardContainer = styled.div<{ themeMode: 'light' | 'dark' }>`
   margin: 0 auto;
 `;
 
+const Backgruond = styled.div<{ themeMode: 'light' | 'dark' }>`
+    background-color: ${({ themeMode }) => (themeMode === 'dark' ? '#222' : '#f9f9f9')};
+    color: ${({ themeMode }) => (themeMode === 'dark' ? '#fff' : '#000')};
+    width: 100%;
+    height: 100%;
+    padding: 100px 0px;
+`;
+
 const ProfileImage = styled.img`
   width: 80px;
   height: 80px;
@@ -48,6 +56,7 @@ const ButtonRow = styled.div`
 
 const DashboardView: React.FC = () => {
     const [showPopup, setShowPopup] = useState(false);
+    const [logOutPopup, setLogOutPopup] = useState(false);
     const user = auth.currentUser;
     const dispatch = useAppDispatch();
     const theme = useAppSelector((state) => state.theme.theme);
@@ -91,6 +100,7 @@ const DashboardView: React.FC = () => {
     );
 
     return (
+        <Backgruond themeMode={theme}>
         <DashboardContainer themeMode={theme}>
             <h2>Dashboard</h2>
             <ProfileImage src={user.photoURL || DEFAULT_PROFILE_IMAGE} alt="Profile" />
@@ -113,11 +123,21 @@ const DashboardView: React.FC = () => {
                     onClose={() => setShowPopup(false)}
                 />
             )}
+            {logOutPopup && (
+                <PopupView
+                    mode='confirm'
+                    message='Are you sure you want to log out?'
+                    onClose={(result) => {
+                        if (result === true) { handleLogout(); }
+                        setLogOutPopup(false);
+                    }}
+                />)}
             <ButtonRow>
                 <Button themeMode={theme} onClick={handleBack}>Back</Button>
-                <Button themeMode={theme} onClick={handleLogout}>Log Out</Button>
+                <Button themeMode={theme} onClick={()=>setLogOutPopup(true)}>Log Out</Button>
             </ButtonRow>
         </DashboardContainer>
+        </Backgruond>
     );
 };
 
