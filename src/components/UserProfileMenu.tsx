@@ -27,7 +27,7 @@ const ProfileImage = styled.img`
 
 const Dropdown = styled.div<{ themeMode: 'light' | 'dark' }>`
   position: absolute;
-  right: 0;
+  left: 50px;
   top: 40px;
   background-color: ${({ themeMode }) => (themeMode === 'dark' ? '#333' : '#fff')};
   color: ${({ themeMode }) => (themeMode === 'dark' ? '#fff' : '#000')};

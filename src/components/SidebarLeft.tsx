@@ -1,13 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { createProject} from '../redux/projectsSlice';
-import { SidebarContainer, Wrapper } from '../styles/Sidebar.style';
-import { FloatingToggle, ResizeHandle, TopBar, UserAccount } from '../styles/SidebarLeft.style';
+import { FloatingToggle, SidebarContainer, Wrapper } from '../styles/Sidebar.style';
+import { ResizeHandle, TopBar } from '../styles/SidebarLeft.style';
 import ProjectListItem from './ProjectListItem';
-import { setView } from '../redux/uiSlice';
-import { auth } from './firebase-ui/firebase';
-import { setUser } from '../redux/authSlice';
-import ThemeToggle from './ThemeToggle';
 import UserProfileMenu from './UserProfileMenu';
 
 export default function SidebarLeft() {
@@ -19,15 +15,12 @@ export default function SidebarLeft() {
   const [isToggling, setIsToggling] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const resizingRef = useRef(false);
+  const theme = useAppSelector((state) => state.theme.theme);
 
   const toggleSidebar = () => {
     setIsToggling(true);
     setHidden((prev) => !prev);
     setTimeout(() => setIsToggling(false), 300);
-  };
-
-  const handleLogout = () => {     
-        dispatch(setView('login'));  
   };
 
   useEffect(() => {
@@ -70,6 +63,7 @@ export default function SidebarLeft() {
         width={width}
         hidden={hidden}
         isToggling={isToggling}
+        themeMode={theme}
       >
         {!hidden && <ResizeHandle className="resize-handle" />}
         <UserProfileMenu/>
@@ -82,7 +76,7 @@ export default function SidebarLeft() {
         ))}
       </SidebarContainer>
 
-      <FloatingToggle onClick={toggleSidebar}>
+      <FloatingToggle onClick={toggleSidebar} themeMode={theme} isRight={false}>
         {hidden ? '▶' : '◀'}
       </FloatingToggle>
     </Wrapper>

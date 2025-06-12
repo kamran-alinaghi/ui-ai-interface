@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, JSX } from 'react';
-import { SidebarContainer, Wrapper } from '../styles/Sidebar.style';
-import { ResizeHandle, FloatingToggle } from '../styles/SidebarRight.style';
+import { FloatingToggle, SidebarContainer, Wrapper } from '../styles/Sidebar.style';
+import { ResizeHandle } from '../styles/SidebarRight.style';
 import FlowChart from './ReactFlow';
 import ReactFlow from 'reactflow';
+import { useAppSelector } from '../hooks';
 
 
 
@@ -12,6 +13,7 @@ export default function SidebarRight({ content }: { content: JSX.Element }) {
   const [isToggling, setIsToggling] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const resizingRef = useRef(false);
+  const theme = useAppSelector((state) => state.theme.theme);
 
   const toggleSidebar = () => {
     setIsToggling(true);
@@ -56,7 +58,7 @@ export default function SidebarRight({ content }: { content: JSX.Element }) {
 
   return (
     <Wrapper>
-      <FloatingToggle onClick={toggleSidebar}>
+      <FloatingToggle onClick={toggleSidebar} themeMode={theme} isRight={true}>
         {hidden ? '◀' : '▶'}
       </FloatingToggle>
 
@@ -65,6 +67,7 @@ export default function SidebarRight({ content }: { content: JSX.Element }) {
         width={width}
         hidden={hidden}
         isToggling={isToggling}
+        themeMode={theme}
       >
         {!hidden && <ResizeHandle className="resize-handle"/>}
         {content}

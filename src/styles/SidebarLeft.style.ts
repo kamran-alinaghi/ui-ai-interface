@@ -40,23 +40,6 @@ export const ResizeHandle = styled.div`
   z-index: 10;
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.1);
-  }
-`;
-
-export const FloatingToggle = styled.button`
-  position: absolute;
-  top: 10px;
-  right: -24px;
-  width: 24px;
-  height: 24px;
-  background-color: #e0e0e0;
-  border: 1px solid #ccc;
-  border-radius: 0px 4px 4px 0px;
-  cursor: pointer;
-  z-index: 1;
-
-  &:hover {
-    background-color: #d0d0d0;
+    background-color: rgb(125, 125, 125);
   }
 `;
