@@ -2,7 +2,6 @@ import { useState, useRef, useEffect, JSX } from 'react';
 import { FloatingToggle, SidebarContainer, Wrapper } from '../styles/Sidebar.style';
 import { ResizeHandle } from '../styles/SidebarRight.style';
 import FlowChart from './ReactFlow';
-import ReactFlow from 'reactflow';
 import { useAppSelector } from '../hooks';
 
 
