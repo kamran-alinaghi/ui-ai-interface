@@ -67,9 +67,6 @@ export default function SidebarLeft() {
       >
         {!hidden && <ResizeHandle className="resize-handle" />}
         <UserProfileMenu/>
-        <TopBar>
-          <button onClick={() => dispatch(createProject())}>+ New</button>
-        </TopBar>
 
         {projects.map((p) => (
           <ProjectListItem key={p.id} project={p} />

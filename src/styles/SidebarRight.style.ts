@@ -8,7 +8,7 @@ export const ResizeHandle = styled.div`
   height: 100%;
   cursor: ew-resize;
   background-color: transparent;
-  z-index: 10;
+  z-index: 100;
 
   &:hover {
     background-color: rgb(125, 125, 125);

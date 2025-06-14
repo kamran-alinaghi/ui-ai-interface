@@ -3,7 +3,8 @@ import { useAppDispatch, useAppSelector } from '../hooks';
 import { auth } from './firebase-ui/firebase';
 import { setView } from '../redux/uiSlice';
 import { setUser } from '../redux/authSlice';
-import { Container, Dropdown, DropdownItem, ProfileImage, UserName } from '../styles/UserProfileMenu.style';
+import { AddButton, Container, Dropdown, DropdownItem, ProfileImage, UserName } from '../styles/UserProfileMenu.style';
+import { createProject } from '../redux/projectsSlice';
 
 const DEFAULT_PROFILE_IMAGE = 'https://www.gravatar.com/avatar/?d=mp&s=80';
 
@@ -57,6 +58,10 @@ const UserProfileMenu: React.FC = () => {
         alt="Profile"
         onClick={() => setMenuOpen((open) => !open)}
       />
+      
+      <AddButton themeMode={theme} onClick={()=>dispatch(createProject())}>
+      +
+    </AddButton>
       {menuOpen && (
         <Dropdown themeMode={theme}>
           <DropdownItem themeMode={theme}>

@@ -1,8 +1,11 @@
 import { styled } from "styled-components";
 
 export const Container = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   position: relative;
-  display: inline-block;
+  margin: 10px;
 `;
 
 export const ProfileImage = styled.img`
@@ -14,6 +17,26 @@ export const ProfileImage = styled.img`
   border: 2px solid transparent;
   &:hover {
     border-color: #2196F3;
+  }
+`;
+
+export const AddButton = styled.button<{ themeMode: 'light' | 'dark' }>`
+  background: ${({ themeMode }) => (themeMode === 'dark' ? '#444' : '#e0e0e0')};
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ themeMode }) => (themeMode === 'dark' ? '#fff' : '#000')};
+  transition: background 0.3s;
+
+  &:hover {
+    background: ${({ themeMode }) => (themeMode === 'dark' ? '#666' : '#ccc')};
   }
 `;
 
