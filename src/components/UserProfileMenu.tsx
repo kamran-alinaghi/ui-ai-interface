@@ -58,10 +58,10 @@ const UserProfileMenu: React.FC = () => {
         alt="Profile"
         onClick={() => setMenuOpen((open) => !open)}
       />
-      
-      <AddButton themeMode={theme} onClick={()=>dispatch(createProject())}>
-      +
-    </AddButton>
+
+      <AddButton themeMode={theme} onClick={() => dispatch(createProject())}>
+        +
+      </AddButton>
       {menuOpen && (
         <Dropdown themeMode={theme}>
           <DropdownItem themeMode={theme}>

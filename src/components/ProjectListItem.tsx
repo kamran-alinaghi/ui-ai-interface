@@ -17,9 +17,10 @@ import PopupView from './PopupView';
 
 interface Props {
   project: Project;
+  parentWidth: number;
 }
 
-const ProjectListItem: React.FC<Props> = ({ project }) => {
+const ProjectListItem: React.FC<Props> = ({ project, parentWidth }) => {
   const dispatch = useAppDispatch();
   const activeId = useAppSelector((s) => s.projects.activeProjectId);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -28,6 +29,14 @@ const ProjectListItem: React.FC<Props> = ({ project }) => {
 
   const [popupMode, setPopupMode] = useState<'prompt' | 'confirm' | null>(null);
   const [popupMessage, setPopupMessage] = useState('');
+  const [dropdownLeft, setDropdownLeft] = useState(90);
+
+  const handleDropDownPosition = (e: React.MouseEvent) => {
+    const max = parentWidth - 80;
+    const left = e.clientX > max ? max : e.clientX;
+    setDropdownLeft(left);
+    setMenuOpen(true);
+  };
 
   const handleRename = () => {
     setPopupMessage(`Rename project "${project.name}"`);
@@ -79,12 +88,12 @@ const ProjectListItem: React.FC<Props> = ({ project }) => {
       <MoreButton
         active={project.id === activeId}
         themeMode={theme}
-        onClick={() => setMenuOpen((open) => !open)}
+        onClick={handleDropDownPosition}
       >
         ⋮
       </MoreButton>
       {menuOpen && (
-        <Dropdown themeMode={theme}>
+        <Dropdown themeMode={theme} left={dropdownLeft}>
           <DropdownItem onClick={handleRename}>Rename</DropdownItem>
           <DropdownItem onClick={handleDelete}>Delete</DropdownItem>
         </Dropdown>

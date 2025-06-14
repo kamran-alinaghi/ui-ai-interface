@@ -7,10 +7,18 @@ export const Container = styled.div`
   padding: 0px 0px 0px 10px;
   position: relative;
   margin-bottom: 8px;
+  margin-right: 10px;
 `;
 
-export const NameButton = styled.button<{ active: boolean, themeMode: 'light' | 'dark' }>`
-  background-color: ${({ active , themeMode }) => (themeMode==='light'? (active ? '#2a93f5' : '#1e3a8a'):(active ? '#1b3070' : '#0f1b40'))};
+export const NameButton = styled.button<{ active: boolean; themeMode: 'light' | 'dark' }>`
+  background-color: ${({ active, themeMode }) =>
+    themeMode === 'light'
+      ? active
+        ? '#2a93f5'
+        : '#1e3a8a'
+      : active
+      ? '#1b3070'
+      : '#0f1b40'};
   color: white;
   padding: 6px 10px;
   border: none;
@@ -18,10 +26,16 @@ export const NameButton = styled.button<{ active: boolean, themeMode: 'light' | 
   cursor: pointer;
   height: 30px;
 
+  max-width: 450px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
   &:hover {
     color: #14f53d;
   }
 `;
+
 
 export const MoreButton = styled.button<{ active: boolean, themeMode: 'light' | 'dark' }>`
   background-color: ${({ active , themeMode }) => (themeMode==='light'? (active ? '#2a93f5' : '#1e3a8a'):(active ? '#1b3070' : '#0f1b40'))};
@@ -37,10 +51,10 @@ export const MoreButton = styled.button<{ active: boolean, themeMode: 'light' | 
   }
 `;
 
-export const Dropdown = styled.div<{ themeMode: 'light' | 'dark' }>`
+export const Dropdown = styled.div<{ themeMode: 'light' | 'dark'; left: number }>`
   position: absolute;
   top: 30px;
-  left: 90px;
+  left: ${({ left }) => `${left}px`};
   background-color: ${({ themeMode }) => (themeMode === 'dark' ? '#333' : '#fff')};
   color: ${({ themeMode }) => (themeMode === 'dark' ? '#ffffff' : '#000000')};
   border: 1px solid #ccc;
@@ -50,12 +64,13 @@ export const Dropdown = styled.div<{ themeMode: 'light' | 'dark' }>`
   overflow: hidden;
 `;
 
+
 export const DropdownItem = styled.div`
   padding: 8px 12px;
   cursor: pointer;
   white-space: nowrap;
   font-size: 14px;
   &:hover {
-    background-color: #e5e5e5;
+    background-color: #616161;
   }
 `;

@@ -4,7 +4,7 @@ import { addMessage, updateAIResponse } from '../redux/chatSlice';
 import { sendMessageToAI, saveMessageToDB } from '../utils/api';
 import { v4 as uuidv4 } from 'uuid';
 import { Message } from '../types/message';
-import { BottomSection, Button, Container, Input, TextArea } from '../styles/MainInput.style';
+import { BottomSection, Button, Container, TextArea } from '../styles/MainInput.style';
 
 export default function MainInput() {
   const [text, setText] = useState('');

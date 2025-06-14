@@ -1,13 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../hooks';
-import { createProject} from '../redux/projectsSlice';
+import { useAppSelector } from '../hooks';
 import { FloatingToggle, SidebarContainer, Wrapper } from '../styles/Sidebar.style';
-import { ResizeHandle, TopBar } from '../styles/SidebarLeft.style';
+import { ResizeHandle } from '../styles/SidebarLeft.style';
 import ProjectListItem from './ProjectListItem';
 import UserProfileMenu from './UserProfileMenu';
 
 export default function SidebarLeft() {
-  const dispatch = useAppDispatch();
   const projects = useAppSelector((s) => s.projects.list);
 
   const [width, setWidth] = useState(250);
@@ -69,7 +67,7 @@ export default function SidebarLeft() {
         <UserProfileMenu/>
 
         {projects.map((p) => (
-          <ProjectListItem key={p.id} project={p} />
+          <ProjectListItem key={p.id} project={p} parentWidth={width}/>
         ))}
       </SidebarContainer>
 
