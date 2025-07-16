@@ -3,7 +3,6 @@ import { RootState } from "../redux/store";
 import { useEffect } from "react";
 import { setView } from "../redux/uiSlice";
 import LoginView from "./firebase-ui/LoginView";
-import SignupView from "./firebase-ui/SignupView";
 import MainView from "./MainView";
 import { auth } from './firebase-ui/firebase';
 import { readData } from "./firebase-ui/firebaseUtils";
@@ -39,7 +38,6 @@ const ViewSelector: React.FC = () => {
     return (
         <div style={{ height: '100vh', overflow: 'hidden' }}>
             {currentView === 'login' && <LoginView />}
-            {currentView === 'signup' && <SignupView />}
             {currentView === 'main' && <MainView />}
             {currentView === 'dashboard' && <DashboardView />}
         </div>

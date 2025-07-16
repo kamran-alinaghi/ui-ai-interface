@@ -1,59 +1,96 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { auth, googleProvider } from './firebase';
+import { signInWithEmailAndPassword, signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
+import { useAppDispatch } from '../../hooks';
+import { setUser } from '../../redux/authSlice';
 import { setView } from '../../redux/uiSlice';
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInWithRedirect } from 'firebase/auth';
-import { auth } from '../firebase-ui/firebase';
+import {
+  LoginWrapper,
+  LoginForm,
+  LoginInput,
+  LoginButton,
+  ErrorText,
+  LoginTitle,
+  GoogleButton,
+  Divider,
+  SecondaryButton
+} from '../../styles/LoginView.style';
 
-const LoginView: React.FC = () => {
+export default function Login() {
+  const dispatch = useAppDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const dispatch = useDispatch();
+  const [error, setError] = useState('');
 
-  const handleLogin = async () => {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-      console.error(error);
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      dispatch(setUser(result.user));
+      dispatch(setView('main'));
+    } catch (err: any) {
+      setError(err.message || 'Login failed');
     }
   };
 
   const handleGoogleLogin = async () => {
-  try {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
-  } catch (error) {
-    console.error(error);
-  }
-};
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      dispatch(setUser(result.user));
+      dispatch(setView('main'));
+    } catch (err: any) {
+      setError(err.message || 'Google Sign-in failed');
+    }
+  };
+
+  const handleSignup = async () => {
+    if (!email || !password) {
+      setError("Email and password are required to sign up.");
+      return;
+    }
+
+    try {
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      dispatch(setUser(result.user));
+      dispatch(setView('main'));
+    } catch (err: any) {
+      setError(err.message || 'Signup failed');
+    }
+  };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <input
-        type="text"
-        placeholder="Email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-      />
-      <button onClick={handleLogin}>Login</button>
-      <p>
-        Create an account?{' '}
-        <span
-          style={{ color: 'blue', cursor: 'pointer' }}
-          onClick={() => dispatch(setView('signup'))}
-        >
-          Sign Up
-        </span>
-      </p>
-      <button onClick={handleGoogleLogin}>Login with Google</button>
-    </div>
-  );
-};
+    <LoginWrapper>
+      <LoginForm onSubmit={handleLogin}>
+        <LoginTitle>Welcome Back</LoginTitle>
+        <LoginInput
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <LoginInput
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <LoginButton type="submit">Sign In</LoginButton>
 
-export default LoginView;
+        <Divider>or</Divider>
+
+        <GoogleButton type="button" onClick={handleGoogleLogin}>
+          Continue with Google
+        </GoogleButton>
+
+        <SecondaryButton type="button" onClick={handleSignup}>
+          Sign Up
+        </SecondaryButton>
+
+        {error && <ErrorText>{error}</ErrorText>}
+      </LoginForm>
+    </LoginWrapper>
+  );
+}
