@@ -9,9 +9,6 @@ export default function ChatWindow() {
     projectId ? s.chat[projectId]?.messages || [] : []
   );
 
-  console.log(projectId);
-  console.log(messages);
-
   useEffect(() => {
     const container = containerRef.current;
     if (container) {
