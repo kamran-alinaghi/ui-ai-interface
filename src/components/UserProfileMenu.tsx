@@ -5,6 +5,8 @@ import { setView } from '../redux/uiSlice';
 import { setUser } from '../redux/authSlice';
 import { AddButton, Container, Dropdown, DropdownItem, ProfileImage, UserName } from '../styles/UserProfileMenu.style';
 import { createProject } from '../redux/projectsSlice';
+import { initProject } from '../redux/chatSlice';
+import { AppDispatch, RootState } from '../redux/store';
 
 const DEFAULT_PROFILE_IMAGE = 'https://www.gravatar.com/avatar/?d=mp&s=80';
 
@@ -14,6 +16,16 @@ const UserProfileMenu: React.FC = () => {
   const dispatch = useAppDispatch();
   const [menuOpen, setMenuOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  const createProjectWithChat = () => (
+    dispatch: AppDispatch,
+    getState: () => RootState
+  ) => {
+    dispatch(createProject());
+    const id = getState().projects.activeProjectId;
+    if (id) dispatch(initProject(id));
+  };
+
 
   const handleLogout = () => {
     auth.signOut()
@@ -59,7 +71,7 @@ const UserProfileMenu: React.FC = () => {
         onClick={() => setMenuOpen((open) => !open)}
       />
 
-      <AddButton themeMode={theme} onClick={() => dispatch(createProject())}>
+      <AddButton themeMode={theme} onClick={() => dispatch(createProjectWithChat())}>
         +
       </AddButton>
       {menuOpen && (
