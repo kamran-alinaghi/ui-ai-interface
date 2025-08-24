@@ -1,40 +1,52 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks';
-import { auth } from './firebase-ui/firebase';
+import { auth, db } from './firebase-ui/firebase'; // db added here
 import { setView } from '../redux/uiSlice';
 import { setUser } from '../redux/authSlice';
 import { AddButton, Container, Dropdown, DropdownItem, ProfileImage, UserName } from '../styles/UserProfileMenu.style';
-import { createProject } from '../redux/projectsSlice';
 import { initProject } from '../redux/chatSlice';
 import { AppDispatch, RootState } from '../redux/store';
+
+// 🔁 Firestore-backed thunk
+import { createUserProject } from '../redux/projectsThunks';
 
 const DEFAULT_PROFILE_IMAGE = 'https://www.gravatar.com/avatar/?d=mp&s=80';
 
 const UserProfileMenu: React.FC = () => {
-  const user = auth.currentUser;
-  const theme = useAppSelector((state) => state.theme.theme);
   const dispatch = useAppDispatch();
+  const theme = useAppSelector((state) => state.theme.theme);
+  const uid = useAppSelector((s) => s.auth.currentUser?.uid);
+
   const [menuOpen, setMenuOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  const createProjectWithChat = () => (
-    dispatch: AppDispatch,
-    getState: () => RootState
-  ) => {
-    dispatch(createProject());
-    const id = getState().projects.activeProjectId;
-    if (id) dispatch(initProject(id));
-  };
+  // Create project in Firestore, select it, and init chat state
+  // inside UserProfileMenu
+
+const createProjectWithChat = () => async (dispatch: AppDispatch, getState: () => RootState) => {
+  if (!uid) return;
+
+  // our thunk returns Project
+  const proj = await dispatch(createUserProject(db, uid));
+
+  // project is already selected by createUserProject (it dispatches selectProject)
+  // but we still need to init chat state for it
+  const createdId = proj.id ?? getState().projects.activeProjectId;
+  if (createdId) {
+    dispatch(initProject(createdId));
+  }
+};
 
 
   const handleLogout = () => {
-    auth.signOut()
+    auth
+      .signOut()
       .then(() => {
         dispatch(setUser(null));
         dispatch(setView('login'));
       })
       .catch((error) => {
-        console.error("Error signing out:", error);
+        console.error('Error signing out:', error);
       });
   };
 
@@ -55,18 +67,17 @@ const UserProfileMenu: React.FC = () => {
     } else {
       document.removeEventListener('mousedown', handleOutsideClick);
     }
-
     return () => {
       document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, [menuOpen]);
 
-  if (!user) return null;
+  if (!auth.currentUser) return null;
 
   return (
     <Container ref={ref}>
       <ProfileImage
-        src={user.photoURL || DEFAULT_PROFILE_IMAGE}
+        src={auth.currentUser.photoURL || DEFAULT_PROFILE_IMAGE}
         alt="Profile"
         onClick={() => setMenuOpen((open) => !open)}
       />
@@ -74,10 +85,11 @@ const UserProfileMenu: React.FC = () => {
       <AddButton themeMode={theme} onClick={() => dispatch(createProjectWithChat())}>
         +
       </AddButton>
+
       {menuOpen && (
         <Dropdown themeMode={theme}>
           <DropdownItem themeMode={theme}>
-            <UserName>{user.displayName || user.email}</UserName>
+            <UserName>{auth.currentUser.displayName || auth.currentUser.email}</UserName>
           </DropdownItem>
           <DropdownItem themeMode={theme} onClick={handleDashboard}>
             Dashboard

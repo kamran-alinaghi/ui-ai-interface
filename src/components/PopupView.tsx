@@ -8,12 +8,13 @@ interface PopupProps {
   mode: PopupMode;
   message: string;
   onClose: (result?: string | boolean) => void;
+  defaultValue?: string;
 }
 
 
 
-const PopupView: React.FC<PopupProps> = ({ mode, message, onClose }) => {
-  const [inputValue, setInputValue] = useState('');
+const PopupView: React.FC<PopupProps> = ({ mode, message, onClose, defaultValue }) => {
+  const [inputValue, setInputValue] = useState(defaultValue ??'');
   const theme = useAppSelector((state) => state.theme.theme);
 
   const handleConfirm = () => {

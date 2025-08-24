@@ -1,19 +1,41 @@
 import { useState, useRef, useEffect } from 'react';
-import { useAppSelector } from '../hooks';
+import { useAppSelector, useAppDispatch } from '../hooks';
 import { FloatingToggle, SidebarContainer, Wrapper } from '../styles/Sidebar.style';
 import { ResizeHandle } from '../styles/SidebarLeft.style';
 import ProjectListItem from './ProjectListItem';
 import UserProfileMenu from './UserProfileMenu';
 
-export default function SidebarLeft() {
-  const projects = useAppSelector((s) => s.projects.list);
+// 🔌 Firestore instance + thunk to subscribe projects
+import { db } from './firebase-ui/firebase'; // adjust path if your db is exported elsewhere
+import { subscribeUserProjects } from '../redux/projectsThunks';
 
+export default function SidebarLeft() {
+  const dispatch = useAppDispatch();
+
+  // Auth + theme + projects from Redux
+  const uid = useAppSelector((s) => s.auth.currentUser?.uid);
+  const authChecked = useAppSelector((s) => s.auth.authChecked);
+  const projects = useAppSelector((s) => s.projects.list);
+  const theme = useAppSelector((s) => s.theme.theme);
+
+  // Local UI state
   const [width, setWidth] = useState(250);
   const [hidden, setHidden] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const resizingRef = useRef(false);
-  const theme = useAppSelector((state) => state.theme.theme);
+
+  // 🧩 Subscribe to the user's projects in real time after auth is ready
+  useEffect(() => {
+    if (!authChecked) return;                 // wait until auth is known
+    if (!uid) return; 
+    // dispatch returns the unsubscribe function from the thunk
+    const unsubscribe = dispatch(subscribeUserProjects(db, uid));
+    return () => {
+      // unsubscribe is a function
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
+  }, [dispatch, uid, authChecked]);
 
   const toggleSidebar = () => {
     setIsToggling(true);
@@ -21,13 +43,12 @@ export default function SidebarLeft() {
     setTimeout(() => setIsToggling(false), 300);
   };
 
+  // 🖱️ Resize logic
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!resizingRef.current) return;
       const newWidth = e.clientX;
-      if (newWidth >= 180 && newWidth <= 500) {
-        setWidth(newWidth);
-      }
+      if (newWidth >= 180 && newWidth <= 500) setWidth(newWidth);
     };
 
     const stopResize = () => {
@@ -45,13 +66,8 @@ export default function SidebarLeft() {
     };
 
     const resizer = sidebarRef.current?.querySelector('.resize-handle');
-    if (!hidden && resizer) {
-      resizer.addEventListener('mousedown', startResize);
-    }
-
-    return () => {
-      resizer?.removeEventListener('mousedown', startResize);
-    };
+    if (!hidden && resizer) resizer.addEventListener('mousedown', startResize);
+    return () => resizer?.removeEventListener('mousedown', startResize);
   }, [hidden]);
 
   return (
@@ -64,10 +80,10 @@ export default function SidebarLeft() {
         themeMode={theme}
       >
         {!hidden && <ResizeHandle className="resize-handle" />}
-        <UserProfileMenu/>
+        <UserProfileMenu />
 
         {projects.map((p) => (
-          <ProjectListItem key={p.id} project={p} parentWidth={width}/>
+          <ProjectListItem key={p.id} project={p} parentWidth={width} />
         ))}
       </SidebarContainer>
 

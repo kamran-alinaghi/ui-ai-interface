@@ -1,11 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Project } from '../types/project';
 import { useAppDispatch, useAppSelector } from '../hooks';
-import {
-  selectProject,
-  renameProject,
-  deleteProject,
-} from '../redux/projectsSlice';
+import { selectProject } from '../redux/projectsSlice';
 import {
   Container,
   NameButton,
@@ -15,6 +11,10 @@ import {
 } from '../styles/ProjectListItem.style';
 import PopupView from './PopupView';
 
+// 🔌 Firestore + thunks
+import { db } from './firebase-ui/firebase';
+import { renameUserProject, deleteUserProject } from '../redux/projectsThunks';
+
 interface Props {
   project: Project;
   parentWidth: number;
@@ -23,13 +23,16 @@ interface Props {
 const ProjectListItem: React.FC<Props> = ({ project, parentWidth }) => {
   const dispatch = useAppDispatch();
   const activeId = useAppSelector((s) => s.projects.activeProjectId);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const theme = useAppSelector((state) => state.theme.theme);
+  const theme = useAppSelector((s) => s.theme.theme);
 
+  const [menuOpen, setMenuOpen] = useState(false);
   const [popupMode, setPopupMode] = useState<'prompt' | 'confirm' | null>(null);
   const [popupMessage, setPopupMessage] = useState('');
   const [dropdownLeft, setDropdownLeft] = useState(90);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // 👉 store the action we want to run when popup resolves
+  const pendingActionRef = useRef<((result?: string | boolean) => void) | null>(null);
 
   const handleDropDownPosition = (e: React.MouseEvent) => {
     const max = parentWidth - 80;
@@ -38,25 +41,42 @@ const ProjectListItem: React.FC<Props> = ({ project, parentWidth }) => {
     setMenuOpen(true);
   };
 
+  // ✅ Logic now lives here (sets up the action + opens popup)
   const handleRename = () => {
     setPopupMessage(`Rename project "${project.name}"`);
     setPopupMode('prompt');
     setMenuOpen(false);
+
+    pendingActionRef.current = (result) => {
+      if (typeof result === 'string' && result.trim() !== '' && result !== project.name) {
+        // Firestore-backed rename
+        dispatch(renameUserProject(db, project.id, result.trim()));
+      }
+    };
   };
 
+  // ✅ Logic now lives here (sets up the action + opens popup)
   const handleDelete = () => {
     setPopupMessage(`Are you sure you want to delete "${project.name}"?`);
     setPopupMode('confirm');
     setMenuOpen(false);
+
+    pendingActionRef.current = (result) => {
+      if (result === true) {
+        // Firestore-backed delete
+        dispatch(deleteUserProject(db, project.id));
+      }
+    };
   };
 
+  // Popup just triggers whatever action we prepared
   const handlePopupClose = (result?: string | boolean) => {
-    if (popupMode === 'prompt' && typeof result === 'string' && result.trim() !== '') {
-      dispatch(renameProject({ id: project.id, newName: result }));
-    } else if (popupMode === 'confirm' && result === true) {
-      dispatch(deleteProject(project.id));
+    try {
+      pendingActionRef.current?.(result);
+    } finally {
+      pendingActionRef.current = null;
+      setPopupMode(null);
     }
-    setPopupMode(null);
   };
 
   const handleOutsideClick = (e: MouseEvent) => {
@@ -85,6 +105,7 @@ const ProjectListItem: React.FC<Props> = ({ project, parentWidth }) => {
       >
         {project.name}
       </NameButton>
+
       <MoreButton
         active={project.id === activeId}
         themeMode={theme}
@@ -92,17 +113,20 @@ const ProjectListItem: React.FC<Props> = ({ project, parentWidth }) => {
       >
         ⋮
       </MoreButton>
+
       {menuOpen && (
         <Dropdown themeMode={theme} left={dropdownLeft}>
           <DropdownItem onClick={handleRename}>Rename</DropdownItem>
           <DropdownItem onClick={handleDelete}>Delete</DropdownItem>
         </Dropdown>
       )}
+
       {popupMode && (
         <PopupView
           mode={popupMode}
           message={popupMessage}
           onClose={handlePopupClose}
+          defaultValue={popupMode === 'prompt' ? project.name : undefined}
         />
       )}
     </Container>
