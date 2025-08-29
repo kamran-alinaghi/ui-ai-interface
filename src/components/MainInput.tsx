@@ -103,7 +103,7 @@ export default function MainInput() {
           themeMode={theme}
           placeholder={projectId ? 'Type a message…' : 'Select a project to start chatting'}
         />
-        <Button onClick={onSend}>
+        <Button onClick={onSend} disabled={waiting}>
           Send
         </Button>
       </BottomSection>
