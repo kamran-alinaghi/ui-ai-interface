@@ -1,9 +1,9 @@
 // redux/projectsThunks.ts
-import type { ThunkAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, type ThunkAction } from '@reduxjs/toolkit';
 import type { RootState, AppDispatch } from './store';
 import { setProjects, upsertProject, removeProject, bumpUntitled, selectProject } from './projectsSlice';
 import type { Project as UIProject } from '../types/project';
-import type { Firestore } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp, type Firestore } from 'firebase/firestore';
 import {
   subscribeProjects as repoSubscribe,
   listProjects as repoList,
@@ -12,6 +12,8 @@ import {
   deleteProject as repoDelete,
 } from '../data/projectsRepo';
 import { type Project as RepoProject } from '../data/dataTypes';
+import { auth, db } from '../components/firebase-ui/firebase';
+import { initProject } from './chatSlice';
 
 // Map repo.Project -> UI Project type (keeps your existing shape)
 function toUI(p: RepoProject): UIProject {
@@ -74,5 +76,37 @@ export function deleteUserProject(db: Firestore, projectId: string)
   return async (dispatch) => {
     await repoDelete(db, projectId);
     dispatch(removeProject(projectId));
+  };
+}
+
+export function createProjectWithChat(
+  dbArg = db,
+  ownerIdArg?: string,
+  name?: string,
+  description?: string
+): ThunkAction<Promise<string>, RootState, unknown, any> {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const ownerId = ownerIdArg ?? auth.currentUser?.uid ?? 'anonymous';
+    const nextName = name ?? `Untitled${state.projects.untitledCounter}`;
+
+    // Create in repo
+    const created = await repoCreate(dbArg, ownerId, { name: nextName, description });
+    const ui: UIProject = {
+      id: created.id,
+      name: created.name,
+      summary: (created.description ?? '') as any,
+    };
+
+    // Update UI store
+    dispatch(upsertProject(ui));
+    dispatch(selectProject(ui.id));
+    dispatch(bumpUntitled());
+
+    // Init chat state for this project so messages can be added immediately
+    dispatch(initProject(ui.id));
+
+    // Return new id to the caller
+    return ui.id;
   };
 }
