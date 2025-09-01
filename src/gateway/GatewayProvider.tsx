@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { GatewayClient } from './GatewayClient';
-import type { GatewayInbound, GatewayOutbound } from './events';
+import type { GatewayOutbound } from './events';
 
 type Status = 'idle' | 'connecting' | 'open' | 'reconnecting' | 'closed' | 'error' | 'not-connected';
 
@@ -20,7 +20,7 @@ export function GatewayProvider({ projectId, children }: { projectId?: string | 
   const clientIdRef = useRef<string>(uuidv4());
   const prevProjectRef = useRef<string | null>(null);
 
-  const WS_URL = process.env.REACT_APP_GATEWAY_WS_URL ?? 'ws://localhost:8787/ws';
+  const WS_URL = process.env.REACT_APP_GATEWAY_WS_URL ?? '';
 
   useEffect(() => {
     // Always connect
