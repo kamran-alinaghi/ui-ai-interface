@@ -15,6 +15,7 @@ export async function sendMessageToAI(message: Message): Promise<{
           id: crypto.randomUUID(),
           role: 'ai',
           text: `AI reply to "${message.text}"`,
+          createdAt: Date.now()
         },
         summary: `Summary after message "${message.text}"`,
         mosa: {

@@ -23,12 +23,14 @@ export async function handleSendMessage({
     id: uuidv4(),
     role: 'pm',
     text,
+    createdAt: Date.now()
   };
 
   const placeholderMessage: Message = {
     id: uuidv4(),
     role: 'ai',
     text: '...',
+    createdAt: Date.now()
   };
 
   setText('');

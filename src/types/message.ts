@@ -9,6 +9,6 @@ export interface Message {
   text: string;               // streaming appends mutate this
   // Optional metadata (safe defaults keep old code working)
   replyToId?: string;
-  createdAt?: number;         // Date.now()
+  createdAt: number;         // Date.now()
   status?: MessageStatus;     // for UI spinners, etc.
 }
