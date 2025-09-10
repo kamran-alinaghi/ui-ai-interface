@@ -3,14 +3,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { BottomSection, Button, Container, TextArea } from '../styles/MainInput.style';
 import { useGateway } from '../gateway/GatewayProvider';
-import { addMessage, initProject } from '../redux/chatSlice';
+import { addMessage } from '../redux/chatSlice';
 import type { Message } from '../types/message';
 import { sendViaGateway } from '../utils/wsTransport';
 import { updateDB } from '../utils/chatPersistence';
-import { AppDispatch, RootState } from '../redux/store';
-import { createProjectWithChat, createUserProject } from '../redux/projectsThunks';
+import { createProjectWithChat } from '../redux/projectsThunks';
 import { auth, db } from './firebase-ui/firebase';
 import { signInAnonymously } from 'firebase/auth';
+import { sendViaGatewayAndReceive } from '../gateway/gatewayUtils';
 
 export default function MainInput() {
   const [text, setText] = useState('');
@@ -20,7 +20,6 @@ export default function MainInput() {
   const theme = useAppSelector((s) => s.theme.theme);
   const { send, status: wsStatus } = useGateway();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const uid = useAppSelector((s) => s.auth.currentUser?.uid);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -77,8 +76,17 @@ export default function MainInput() {
 
     try {
       // 2) Send over WebSocket
-      await sendViaGateway(send, { projectId: pid!, messageId, text: trimmed });
-      // waiting will flip off when you handle ai_done later
+      if (!pid) return;
+      const [aiId, aiReply] = await sendViaGatewayAndReceive(send, pid, trimmed);
+      const aiMsg: Message = {
+        id: aiId,
+        role: 'ai',
+        text: aiReply,
+        createdAt: Date.now(),
+        status: 'complete',
+      };
+      await updateDB(pid!, aiMsg);
+      setWaiting(false);
     } catch (err) {
       console.error(err);
       alert(err instanceof Error ? err.message : 'Send failed');
